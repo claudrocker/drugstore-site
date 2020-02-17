@@ -46,7 +46,7 @@ app.get("/api/stores", async(req, res, next) => {
         const stores = await getStores();
 
         /* Filters */
-        filteredStores = stores;
+        let filteredStores = stores;
         /*   by communeId (required param) */
         if (req.query.communeId) {
             filteredStores = stores.filter(s => s.fk_comuna === req.query.communeId);
@@ -60,10 +60,24 @@ app.get("/api/stores", async(req, res, next) => {
         }
         /*   by name (string is included in store name) (optional param) */
         if (req.query.name) {
-            filteredStores = filteredStores.filter(s => s.local_nombre.includes(req.query.name.toUpperCase()));
+            if (req.query.name !== '') {
+                filteredStores = filteredStores.filter(s => s.local_nombre.includes(req.query.name.toUpperCase()));
+            }
         }
 
-        res.json({ "stores": filteredStores});
+        /* Format stores */
+        let storesOk = filteredStores.map((s) => {
+            return {
+                store_name: s.local_nombre,
+                address: s.local_direccion,
+                commune: s.comuna_nombre,
+                phone: s.local_telefono,
+                lat: s.local_lat,
+                lng: s.local_lng
+            }
+        });
+
+        res.json({ "stores": storesOk});
     } catch(error) {
         console.log(error);
         res.json({
@@ -101,6 +115,7 @@ async function getCommunes(){
                 })
             }
         });
+
         return parsedData;
     } catch(error) {
         console.log(error);
@@ -112,6 +127,7 @@ async function getStores(){
     const storesUrl = `${STORES_URL}?id_region=${REGION_ID}`;
     try {
         const res = await axios.get(storesUrl);
+
         return res.data;
     } catch(error) {
         console.log(error);

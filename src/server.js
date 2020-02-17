@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const axios = require('axios');
 const qs = require('qs');
 const cheerio = require('cheerio');
+const htmlEntities = require('html-entities').AllHtmlEntities;
 
 const HTTP_PORT = 8000;
 const REGION_ID = 7; // Metropolitan region
@@ -62,7 +63,7 @@ async function getCommunes(){
             if ($(elem).attr('value') !== '0'){
                 parsedData.push({
                     id: $(elem).attr('value'),
-                    name: $(elem).html()
+                    name: htmlEntities.decode($(elem).html())
                 })
             }
         });

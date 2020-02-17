@@ -45,8 +45,25 @@ app.get("/api/stores", async(req, res, next) => {
     try {
         const stores = await getStores();
 
-        /* TODO: Add filters */
-        res.json({ "stores": stores});
+        /* Filters */
+        filteredStores = stores;
+        /*   by communeId (required param) */
+        if (req.query.communeId) {
+            filteredStores = stores.filter(s => s.fk_comuna === req.query.communeId);
+        }
+        else {
+            res.json({
+                "error": true,
+                "message": "Parameter expected: communeId"
+            });
+            return;
+        }
+        /*   by name (string is included in store name) (optional param) */
+        if (req.query.name) {
+            filteredStores = filteredStores.filter(s => s.local_nombre.includes(req.query.name.toUpperCase()));
+        }
+
+        res.json({ "stores": filteredStores});
     } catch(error) {
         console.log(error);
         res.json({

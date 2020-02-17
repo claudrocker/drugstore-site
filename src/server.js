@@ -8,6 +8,7 @@ const htmlEntities = require('html-entities').AllHtmlEntities;
 const HTTP_PORT = 8000;
 const REGION_ID = 7; // Metropolitan region
 const COMMUNES_URL = 'https://midastest.minsal.cl/farmacias/maps/index.php/utilidades/maps_obtener_comunas_por_regiones';
+const STORES_URL = 'https://farmanet.minsal.cl/maps/index.php/ws/getLocalesRegion';
 
 let app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -30,6 +31,22 @@ app.get("/api/communes", async(req, res, next) => {
         res.json({
             "communes": communes
         })
+    } catch(error) {
+        console.log(error);
+        res.json({
+            "error": true,
+            "message": "service unavailable"
+        })
+    }
+});
+
+/* Stores */
+app.get("/api/stores", async(req, res, next) => {
+    try {
+        const stores = await getStores();
+
+        /* TODO: Add filters */
+        res.json({ "stores": stores});
     } catch(error) {
         console.log(error);
         res.json({
@@ -68,6 +85,17 @@ async function getCommunes(){
             }
         });
         return parsedData;
+    } catch(error) {
+        console.log(error);
+        return error;
+    }
+}
+
+async function getStores(){
+    const storesUrl = `${STORES_URL}?id_region=${REGION_ID}`;
+    try {
+        const res = await axios.get(storesUrl);
+        return res.data;
     } catch(error) {
         console.log(error);
         return error;

@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const qs = require('qs');
+const cheerio = require('cheerio');
 
 const HTTP_PORT = 8000;
 const REGION_ID = 7; // Metropolitan region
@@ -37,6 +38,7 @@ app.get("/api/communes", async(req, res, next) => {
     }
 });
 
+/*  External service (Minsal) calls */
 async function getCommunes(){
     let params = qs.stringify({
         reg_id: REGION_ID
@@ -51,8 +53,20 @@ async function getCommunes(){
                 'content-type': 'application/x-www-form-urlencoded;charset=utf-8'
             }
         });
-        console.log(res.data);
-        return [1,2,3];
+
+        /* Scraping the html response */
+        const $ = await cheerio.load(res.data);
+
+        let parsedData = [];
+        $('option').each((i, elem) => {
+            if ($(elem).attr('value') !== '0'){
+                parsedData.push({
+                    id: $(elem).attr('value'),
+                    name: $(elem).html()
+                })
+            }
+        });
+        return parsedData;
     } catch(error) {
         console.log(error);
         return error;

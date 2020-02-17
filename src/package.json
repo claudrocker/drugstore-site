@@ -1,0 +1,22 @@
+{
+  "name": "drugstore-site",
+  "version": "1.0.0",
+  "description": "My solution for a job application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/claudrocker/drugstore-site.git"
+  },
+  "author": "Claudio Alvarez",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/claudrocker/drugstore-site/issues"
+  },
+  "homepage": "https://github.com/claudrocker/drugstore-site#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
